@@ -11,6 +11,7 @@ public class DebugRequest {
     @NotBlank(message = "Error message is required")
     private String errorMessage;
 
+    @NotBlank(message = "Code is required")
     private String code;
 
     @NotBlank(message = "Programming language is required")

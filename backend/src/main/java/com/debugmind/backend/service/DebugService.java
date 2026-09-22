@@ -8,10 +8,10 @@ import com.debugmind.backend.repository.DebugSessionRepository;
 import com.debugmind.backend.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import java.util.List;
-
+import com.debugmind.backend.exception.ForbiddenException;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -36,8 +36,8 @@ public class DebugService {
         session.setErrorMessage(request.getErrorMessage());
         session.setCode(request.getCode());
         session.setLanguage(request.getLanguage());
+        session.setCreatedAt(LocalDateTime.now());
 
-        // Temporary response until we connect the AI
         String aiResponse = aiService.analyzeCode(
                 request.getErrorMessage(),
                 request.getCode(),
@@ -45,8 +45,6 @@ public class DebugService {
         );
 
         session.setAiResponse(aiResponse);
-
-        session.setCreatedAt(LocalDateTime.now());
 
         DebugSession saved =
                 debugSessionRepository.save(session);
@@ -60,6 +58,7 @@ public class DebugService {
                 saved.getCreatedAt()
         );
     }
+
     public List<DebugResponse> getDebugHistory(String email) {
 
         User user = userRepository.findByEmail(email)
@@ -80,5 +79,23 @@ public class DebugService {
                         session.getCreatedAt()
                 ))
                 .toList();
+    }
+    public void deleteDebugSession(String email, Long sessionId) {
+
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() ->
+                        new RuntimeException("User not found"));
+
+        DebugSession session = debugSessionRepository.findById(sessionId)
+                .orElseThrow(() ->
+                        new RuntimeException("Debug session not found"));
+
+        if (!session.getUser().getId().equals(user.getId())) {
+            throw new ForbiddenException(
+                    "You are not allowed to delete this session"
+            );
+        }
+
+        debugSessionRepository.delete(session);
     }
 }

@@ -15,4 +15,5 @@ public class DebugResponse {
     private String language;
     private String aiResponse;
     private LocalDateTime createdAt;
+
 }

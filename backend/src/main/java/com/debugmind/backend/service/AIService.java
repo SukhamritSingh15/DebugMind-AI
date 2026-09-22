@@ -37,29 +37,48 @@ public class AIService {
                 : errorMessage;
 
         String prompt = """
-                You are DebugMind AI, an expert programming debugger.
+        You are DebugMind AI, an expert programming debugger.
 
-                Analyze the following programming error.
+        Analyze the following programming problem carefully.
 
-                Programming language:
-                %s
+        Programming language:
+        %s
 
-                Error message:
-                %s
+        Error message:
+        %s
 
-                Code:
-                %s
+        Code:
+        %s
 
-                Give the response in this structure:
+        Return the analysis using exactly this structure:
 
-                1. Error Explanation
-                2. Root Cause
-                3. Exact Fix
-                4. Corrected Code
-                5. Best Practices
+        1. Error Explanation
+        Explain what the error means in simple but technically accurate terms.
 
-                Be technically accurate and explain the solution clearly.
-                """.formatted(
+        2. Root Cause
+        Identify the exact line, variable, condition, or logic responsible for the problem.
+
+        3. Exact Fix
+        Explain precisely what needs to be changed and why.
+
+        4. Corrected Code
+        Provide ONE complete corrected version of the user's code.
+        Do not provide multiple solutions, alternatives, or options.
+        Do not label solutions as Option A, Option B, etc.
+        Put the corrected code inside exactly ONE Markdown code block.
+
+        5. Best Practices
+        Give a short list of relevant practices that would help prevent this type of bug.
+
+        Important rules:
+        - Follow the structure above exactly.
+        - Provide only ONE recommended solution.
+        - Do not provide alternative implementations unless absolutely necessary.
+        - Do not repeat the same code in multiple sections.
+        - Keep the explanation focused on the actual problem.
+        - The corrected code must be complete and directly usable.
+        - Preserve the user's intended functionality whenever possible.
+        """.formatted(
                 language,
                 errorContext,
                 code == null ? "No code provided." : code

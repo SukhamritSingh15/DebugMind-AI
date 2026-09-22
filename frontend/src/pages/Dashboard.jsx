@@ -49,6 +49,31 @@ const [analysis, setAnalysis] = useState(
 
 const [loading, setLoading] = useState(false)
 const [error, setError] = useState("")
+const [copied, setCopied] = useState(false)
+const [copiedCode, setCopiedCode] = useState(false)
+
+const handleCopyResponse = async () => {
+  if (!analysis?.aiResponse) return
+
+  await navigator.clipboard.writeText(analysis.aiResponse)
+
+  setCopied(true)
+
+  setTimeout(() => {
+    setCopied(false)
+  }, 2000)
+}
+const handleCopyCode = async (code) => {
+  if (!code) return
+
+  await navigator.clipboard.writeText(code)
+
+  setCopiedCode(true)
+
+  setTimeout(() => {
+    setCopiedCode(false)
+  }, 2000)
+}
 useEffect(() => {
   if (selectedSession) return
 
@@ -482,22 +507,85 @@ const getLanguageExtension = () => {
     {/* AI Response */}
     <div className="p-5 sm:p-6">
 
-      <div className="mb-4 flex items-center justify-between">
-        <p className="text-xs font-semibold uppercase tracking-[0.15em] text-cyan-400">
-          DebugMind Response
-        </p>
+      <div className="mb-4 flex items-center justify-between gap-4">
+  <p className="text-xs font-semibold uppercase tracking-[0.15em] text-cyan-400">
+    DebugMind Response
+  </p>
 
-        <span className="font-mono text-[10px] text-slate-700">
-          GEMINI AI
-        </span>
-      </div>
+  <div className="flex items-center gap-3">
+    <button
+      onClick={handleCopyResponse}
+      className="rounded-lg border border-slate-800 px-3 py-1.5 text-[10px] font-medium text-slate-400 transition hover:border-cyan-400/30 hover:text-cyan-300"
+    >
+      {copied ? "Copied ✓" : "Copy response"}
+    </button>
+
+    <span className="font-mono text-[10px] text-slate-700">
+      GEMINI AI
+    </span>
+  </div>
+</div>
 
       <div className="rounded-xl border border-slate-800 bg-slate-950/80 p-5">
 
         <div className="prose prose-invert max-w-none text-sm leading-7 text-slate-300">
-          <ReactMarkdown remarkPlugins={[remarkGfm]}>
-            {analysis.aiResponse}
-          </ReactMarkdown>
+          <ReactMarkdown
+  remarkPlugins={[remarkGfm]}
+  components={{
+    pre({ children }) {
+      return (
+        <div className="relative my-5 overflow-hidden rounded-xl border border-slate-800 bg-slate-950">
+          <div className="flex items-center justify-between border-b border-slate-800 px-4 py-2">
+            <span className="font-mono text-[10px] uppercase tracking-wider text-slate-600">
+              Corrected Code
+            </span>
+
+            <button
+              onClick={() => {
+                const codeElement = children?.props?.children
+
+                if (typeof codeElement === "string") {
+                  handleCopyCode(codeElement)
+                }
+              }}
+              className="rounded-md border border-slate-800 px-2.5 py-1 text-[10px] font-medium text-slate-400 transition hover:border-cyan-400/30 hover:text-cyan-300"
+            >
+              {copiedCode ? "Copied ✓" : "Copy code"}
+            </button>
+          </div>
+
+          <pre className="overflow-x-auto p-4">
+            {children}
+          </pre>
+        </div>
+      )
+    },
+
+    code({ inline, className, children, ...props }) {
+      if (inline) {
+        return (
+          <code
+            className="rounded bg-slate-800 px-1.5 py-0.5 font-mono text-cyan-300"
+            {...props}
+          >
+            {children}
+          </code>
+        )
+      }
+
+      return (
+        <code
+          className={`${className || ""} font-mono text-sm leading-7 text-slate-300`}
+          {...props}
+        >
+          {children}
+        </code>
+      )
+    },
+  }}
+>
+  {analysis.aiResponse}
+</ReactMarkdown>
         </div>
 
       </div>

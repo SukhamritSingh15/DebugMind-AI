@@ -95,13 +95,22 @@ if (!language.trim()) {
 
     setAnalysis(response.data)
   } catch (err) {
-    console.error(err)
+  console.error(err)
 
+  const responseData = err.response?.data
+
+  if (responseData?.errors) {
+    const validationMessages = Object.values(responseData.errors)
+      .join(", ")
+
+    setError(validationMessages)
+  } else {
     setError(
-      err.response?.data ||
+      responseData?.message ||
       "Unable to analyze the error. Please try again."
     )
-  } finally {
+  }
+} finally {
     setLoading(false)
   }
 }

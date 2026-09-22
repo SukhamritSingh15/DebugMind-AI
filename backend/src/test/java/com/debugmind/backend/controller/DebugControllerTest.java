@@ -1,5 +1,5 @@
 package com.debugmind.backend.controller;
-
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import com.debugmind.backend.service.DebugService;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
@@ -56,7 +56,13 @@ class DebugControllerTest {
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(requestBody)
                 )
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.status").value(400))
+                .andExpect(jsonPath("$.message").value("Validation failed"))
+                .andExpect(jsonPath("$.errors.code").value("Code is required"))
+                .andExpect(jsonPath("$.errors.language")
+                        .value("Programming language is required"))
+                .andExpect(jsonPath("$.timestamp").exists());
     }
     @Test
     void shouldCreateDebugSession() throws Exception {

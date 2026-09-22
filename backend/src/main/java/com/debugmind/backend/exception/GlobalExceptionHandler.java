@@ -2,52 +2,89 @@ package com.debugmind.backend.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import org.springframework.web.bind.MethodArgumentNotValidException;
-import java.util.stream.Collectors;
 
+import java.time.LocalDateTime;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(EmailAlreadyExistsException.class)
-    public ResponseEntity<String> handleEmailAlreadyExists(
+    public ResponseEntity<ApiError> handleEmailAlreadyExists(
             EmailAlreadyExistsException exception) {
+
+        ApiError error = new ApiError(
+                HttpStatus.CONFLICT.value(),
+                exception.getMessage(),
+                null,
+                LocalDateTime.now()
+        );
 
         return ResponseEntity
                 .status(HttpStatus.CONFLICT)
-                .body(exception.getMessage());
+                .body(error);
     }
 
     @ExceptionHandler(AIServiceException.class)
-    public ResponseEntity<String> handleAIServiceException(
+    public ResponseEntity<ApiError> handleAIServiceException(
             AIServiceException exception) {
+
+        ApiError error = new ApiError(
+                HttpStatus.BAD_GATEWAY.value(),
+                exception.getMessage(),
+                null,
+                LocalDateTime.now()
+        );
 
         return ResponseEntity
                 .status(HttpStatus.BAD_GATEWAY)
-                .body(exception.getMessage());
+                .body(error);
     }
+
     @ExceptionHandler(ForbiddenException.class)
-    public ResponseEntity<String> handleForbiddenException(
-            ForbiddenException ex
-    ) {
+    public ResponseEntity<ApiError> handleForbiddenException(
+            ForbiddenException exception) {
+
+        ApiError error = new ApiError(
+                HttpStatus.FORBIDDEN.value(),
+                exception.getMessage(),
+                null,
+                LocalDateTime.now()
+        );
+
         return ResponseEntity
                 .status(HttpStatus.FORBIDDEN)
-                .body(ex.getMessage());
+                .body(error);
     }
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<String> handleValidationException(
-            MethodArgumentNotValidException exception
-    ) {
-        String message = exception.getBindingResult()
+    public ResponseEntity<ApiError> handleValidationException(
+            MethodArgumentNotValidException exception) {
+
+        Map<String, String> errors = new LinkedHashMap<>();
+
+        exception.getBindingResult()
                 .getFieldErrors()
-                .stream()
-                .map(error -> error.getDefaultMessage())
-                .collect(Collectors.joining(", "));
+                .forEach(error ->
+                        errors.put(
+                                error.getField(),
+                                error.getDefaultMessage()
+                        )
+                );
+
+        ApiError apiError = new ApiError(
+                HttpStatus.BAD_REQUEST.value(),
+                "Validation failed",
+                errors,
+                LocalDateTime.now()
+        );
 
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
-                .body(message);
+                .body(apiError);
     }
 }

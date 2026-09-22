@@ -6,6 +6,12 @@ import api from "../services/api"
 import ReactMarkdown from "react-markdown"
 import remarkGfm from "remark-gfm"
 
+import CodeMirror from "@uiw/react-codemirror"
+import { javascript } from "@codemirror/lang-javascript"
+import { java } from "@codemirror/lang-java"
+import { python } from "@codemirror/lang-python"
+import { cpp } from "@codemirror/lang-cpp"
+
 function Dashboard() {
   const navigate = useNavigate()
 const { user, logout } = useAuth()
@@ -114,7 +120,22 @@ if (!language.trim()) {
     setLoading(false)
   }
 }
-
+const getLanguageExtension = () => {
+  switch (language) {
+    case "JavaScript":
+      return javascript()
+    case "Java":
+      return java()
+    case "Python":
+      return python()
+    case "C++":
+      return cpp()
+    case "C":
+      return cpp()
+    default:
+      return []
+  }
+}
   return (
     <main className="min-h-screen bg-slate-950 text-white">
 
@@ -309,14 +330,25 @@ if (!language.trim()) {
 
               </div>
 
-              <textarea
+              <CodeMirror
                 value={code}
-                onChange={(event) =>
-                  setCode(event.target.value)
-                }
+                height="320px"
+                extensions={[getLanguageExtension()]}
+                onChange={(value) => setCode(value)}
                 placeholder={`Paste your ${language} code here...`}
-                rows={12}
-                className="w-full resize-y rounded-xl border border-slate-800 bg-slate-950/80 p-4 font-mono text-sm leading-7 text-slate-300 outline-none transition placeholder:text-slate-700 focus:border-cyan-400/40 focus:ring-2 focus:ring-cyan-400/10"
+                theme="dark"
+                basicSetup={{
+                  lineNumbers: true,
+                  foldGutter: true,
+                  dropCursor: true,
+                  allowMultipleSelections: true,
+                  indentOnInput: true,
+                  bracketMatching: true,
+                  closeBrackets: true,
+                  autocompletion: true,
+                  highlightSelectionMatches: true,
+                }}
+                className="overflow-hidden rounded-xl border border-slate-800 bg-slate-950/80"
               />
 
             </div>

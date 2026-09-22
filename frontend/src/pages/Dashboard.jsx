@@ -1,4 +1,5 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
+
 import { useLocation, useNavigate } from "react-router-dom"
 import { useAuth } from "../context/AuthContext"
 import api from "../services/api"
@@ -12,16 +13,28 @@ const { user, logout } = useAuth()
 const location = useLocation()
 const selectedSession = location.state?.session
 
+const savedDraft = localStorage.getItem("debugmind-draft")
+
+let draft = null
+
+if (savedDraft) {
+  try {
+    draft = JSON.parse(savedDraft)
+  } catch {
+    localStorage.removeItem("debugmind-draft")
+  }
+}
+
 const [language, setLanguage] = useState(
-  selectedSession?.language || "Java"
+  selectedSession?.language || draft?.language || "Java"
 )
 
 const [errorMessage, setErrorMessage] = useState(
-  selectedSession?.errorMessage || ""
+  selectedSession?.errorMessage || draft?.errorMessage || ""
 )
 
 const [code, setCode] = useState(
-  selectedSession?.code || ""
+  selectedSession?.code || draft?.code || ""
 )
 
 const [analysis, setAnalysis] = useState(
@@ -29,14 +42,30 @@ const [analysis, setAnalysis] = useState(
 )
 
 const [loading, setLoading] = useState(false)
-
 const [error, setError] = useState("")
+useEffect(() => {
+  if (selectedSession) return
+
+  localStorage.setItem(
+    "debugmind-draft",
+    JSON.stringify({
+      language,
+      errorMessage,
+      code,
+    })
+  )
+}, [language, errorMessage, code, selectedSession])
+
+
 const handleNewDebug = () => {
   setLanguage("Java")
   setErrorMessage("")
   setCode("")
   setAnalysis(null)
   setError("")
+
+  localStorage.removeItem("debugmind-draft")
+
   navigate("/dashboard", { replace: true, state: null })
 }
 

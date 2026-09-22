@@ -20,7 +20,6 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import com.debugmind.backend.exception.AIServiceException;
-import com.debugmind.backend.exception.AIServiceException;
 import com.debugmind.backend.exception.GlobalExceptionHandler;
 class DebugControllerTest {
 
@@ -134,5 +133,49 @@ class DebugControllerTest {
                                 .principal(authentication)
                 )
                 .andExpect(status().isBadGateway());
+    }
+    @Test
+    void shouldAllowDebuggingWithoutErrorMessage() throws Exception {
+
+        DebugResponse response = new DebugResponse(
+                2L,
+                "",
+                "String name = null;\nSystem.out.println(name.length());",
+                "Java",
+                "The code contains a potential NullPointerException because name is null.",
+                LocalDateTime.now()
+        );
+
+        when(debugService.createDebugSession(
+                eq("test@example.com"),
+                any(DebugRequest.class)
+        )).thenReturn(response);
+
+        Authentication authentication =
+                org.mockito.Mockito.mock(Authentication.class);
+
+        when(authentication.getName())
+                .thenReturn("test@example.com");
+
+        String requestBody = """
+        {
+            "errorMessage": "",
+            "code": "String name = null; System.out.println(name.length());",
+            "language": "Java"
+        }
+        """;
+
+        mockMvc.perform(
+                        post("/api/debug")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(requestBody)
+                                .principal(authentication)
+                )
+                .andExpect(status().isOk());
+
+        verify(debugService).createDebugSession(
+                eq("test@example.com"),
+                any(DebugRequest.class)
+        );
     }
 }

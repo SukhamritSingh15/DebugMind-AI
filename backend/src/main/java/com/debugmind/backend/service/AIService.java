@@ -32,6 +32,9 @@ public class AIService {
             String code,
             String language
     ) {
+        String errorContext = errorMessage == null || errorMessage.isBlank()
+                ? "No error message was provided. Analyze the code for potential bugs, errors, and issues."
+                : errorMessage;
 
         String prompt = """
                 You are DebugMind AI, an expert programming debugger.
@@ -58,10 +61,9 @@ public class AIService {
                 Be technically accurate and explain the solution clearly.
                 """.formatted(
                 language,
-                errorMessage,
+                errorContext,
                 code == null ? "No code provided." : code
         );
-
         try {
 
             RestClient client = RestClient.builder()

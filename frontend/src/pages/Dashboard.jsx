@@ -70,10 +70,7 @@ const handleNewDebug = () => {
 }
 
 const handleAnalyze = async () => {
-if (!errorMessage.trim()) {
-  setError("Please enter an error message.")
-  return
-}
+
 
 if (!code.trim()) {
   setError("Please enter the code you want to debug.")
@@ -224,8 +221,8 @@ if (!language.trim()) {
             </h1>
 
             <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-500 sm:text-base">
-              Paste your error and code below. DebugMind AI will analyze
-              the problem and help you understand exactly what went wrong.
+              Paste your error message and code below. Error messages are optional —
+              DebugMind AI can also analyze your code for potential issues.
             </p>
 
           </div>
@@ -239,7 +236,7 @@ if (!language.trim()) {
               <div className="mb-3 flex items-center justify-between">
 
                 <label className="text-sm font-medium text-slate-300">
-                  Error message
+                  Error message <span className="text-slate-500">(Optional)</span>
                 </label>
 
                 <span className="font-mono text-[10px] uppercase tracking-wider text-slate-700">

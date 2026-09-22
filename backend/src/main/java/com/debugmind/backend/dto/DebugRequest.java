@@ -8,7 +8,7 @@ import lombok.Setter;
 @Setter
 public class DebugRequest {
 
-    @NotBlank(message = "Error message is required")
+
     private String errorMessage;
 
     @NotBlank(message = "Code is required")

@@ -5,6 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import com.debugmind.backend.exception.GitHubRepositoryException;
 
 import java.time.LocalDateTime;
 import java.util.LinkedHashMap;
@@ -86,5 +87,20 @@ public class GlobalExceptionHandler {
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
                 .body(apiError);
+    }
+    @ExceptionHandler(GitHubRepositoryException.class)
+    public ResponseEntity<ApiError> handleGitHubRepositoryException(
+            GitHubRepositoryException exception) {
+
+        ApiError error = new ApiError(
+                HttpStatus.NOT_FOUND.value(),
+                exception.getMessage(),
+                null,
+                LocalDateTime.now()
+        );
+
+        return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body(error);
     }
 }

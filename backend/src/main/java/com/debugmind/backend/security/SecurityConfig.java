@@ -55,12 +55,19 @@
                             .requestMatchers(
                                     "/api/test",
                                     "/api/auth/register",
-                                    "/api/auth/login"
+                                    "/api/auth/login",
+
+                                    "/swagger-ui.html",
+                                    "/swagger-ui/index.html",
+                                    "/swagger-ui/**",
+
+                                    "/v3/api-docs",
+                                    "/v3/api-docs/**",
+                                    "/v3/api-docs.yaml"
                             ).permitAll()
 
                             .anyRequest().authenticated()
                     )
-
                     .addFilterBefore(
                             jwtAuthenticationFilter,
                             UsernamePasswordAuthenticationFilter.class
@@ -117,7 +124,7 @@
 
             return source;
         }
-        
+
         @Value("${cors.allowed-origins}")
         private String allowedOrigins;
 

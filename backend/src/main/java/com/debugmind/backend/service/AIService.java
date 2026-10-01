@@ -9,10 +9,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientResponseException;
 import com.debugmind.backend.exception.AIServiceException;
-
+import lombok.extern.slf4j.Slf4j;
 import java.util.List;
 import java.util.Map;
 
+@Slf4j
 @Service
 public class AIService {
     private final RestClient restClient;
@@ -533,7 +534,7 @@ public class AIService {
                     int statusCode = e.getStatusCode().value();
 
                     if (statusCode == 429) {
-                        System.out.println("Gemini API quota exceeded.");
+                        log.warn("Gemini API quota exceeded.");
 
                         throw new AIServiceException(
                                 "Gemini API quota exceeded. Please try again later."
@@ -548,9 +549,9 @@ public class AIService {
 
                     if (!retryable || attempt == MAX_ATTEMPTS) {
 
-                        System.out.println(
-                                "Gemini repository analysis failed with HTTP "
-                                        + statusCode
+                        log.warn(
+                                "Gemini repository analysis failed with HTTP {}"
+                                        , statusCode
                         );
 
                         throw e;
@@ -558,12 +559,12 @@ public class AIService {
 
                     long delay = attempt * 2000L;
 
-                    System.out.println(
-                            "Gemini temporarily unavailable (HTTP "
-                                    + statusCode
-                                    + "). Retrying in "
-                                    + (delay / 1000)
-                                    + " seconds..."
+                    log.warn(
+                            "Gemini temporarily unavailable (HTTP {}"
+                                    , statusCode
+                                    , "). Retrying in {}"
+                                    , (delay / 1000)
+                                    , " seconds..."
                     );
 
                     try {
@@ -588,12 +589,12 @@ public class AIService {
 
         } catch (Exception e) {
 
-            System.out.println(
-                    "Gemini repository analysis error: "
-                            + e.getMessage()
+            log.warn(
+                    "Gemini repository analysis error: {}"
+                            , e.getMessage()
             );
 
-            e.printStackTrace();
+            log.error("Gemini API request failed", e);
 
             throw new AIServiceException(
                     "AI service temporarily unavailable",

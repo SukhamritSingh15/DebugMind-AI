@@ -16,6 +16,8 @@ import java.util.Map;
 import java.util.LinkedHashMap;
 import org.springframework.beans.factory.annotation.Value;
 import java.util.Comparator;
+import lombok.extern.slf4j.Slf4j;
+@Slf4j
 @Service
 public class GitHubService {
 
@@ -80,9 +82,9 @@ public class GitHubService {
 
         } catch (RestClientException exception) {
 
-            System.out.println(
+            log.warn(
                     "GitHub API error: "
-                            + exception.getMessage()
+                            , exception.getMessage()
             );
 
             throw new GitHubRepositoryException(
@@ -120,7 +122,7 @@ public class GitHubService {
 
         } catch (RestClientException exception) {
 
-            System.out.println(
+            log.warn(
                     "GitHub tree API error: "
                             + exception.getMessage()
             );
@@ -197,12 +199,12 @@ public class GitHubService {
 
         } catch (RestClientException exception) {
 
-            System.out.println(
-                    "GitHub file fetch error for: " + filePath
+            log.warn(
+                    "GitHub file fetch error for: {}" , filePath
             );
 
-            System.out.println(
-                    "GitHub API error: " + exception.getMessage()
+            log.warn(
+                    "GitHub API error: {}" , filePath,exception
             );
 
             throw new GitHubRepositoryException(

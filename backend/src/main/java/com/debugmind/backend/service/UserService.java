@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 import com.debugmind.backend.exception.EmailAlreadyExistsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import com.debugmind.backend.dto.LoginResponse;
-
+import com.debugmind.backend.exception.InvalidCredentialsException;
 @Service
 @RequiredArgsConstructor
 public class UserService {
@@ -35,10 +35,10 @@ public class UserService {
 
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() ->
-                        new RuntimeException("Invalid email or password"));
+                        new InvalidCredentialsException("Invalid email or password"));
 
         if (!passwordEncoder.matches(password, user.getPassword())) {
-            throw new RuntimeException("Invalid email or password");
+            throw new InvalidCredentialsException("Invalid email or password");
         }
 
         String token = jwtUtil.generateToken(user.getEmail());

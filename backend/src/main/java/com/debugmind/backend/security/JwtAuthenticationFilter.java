@@ -33,8 +33,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
             String token = authorizationHeader.substring(7);
 
-            if (jwtUtil.isTokenValid(token)) {
-
+            try {
                 String email = jwtUtil.extractEmail(token);
 
                 UsernamePasswordAuthenticationToken authentication =
@@ -47,6 +46,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 SecurityContextHolder
                         .getContext()
                         .setAuthentication(authentication);
+
+            } catch (Exception e) {
+                // Invalid or expired JWT — continue without authentication
             }
         }
 

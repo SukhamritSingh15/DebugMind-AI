@@ -9,7 +9,7 @@ import com.debugmind.backend.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import com.debugmind.backend.exception.ForbiddenException;
-
+import com.debugmind.backend.exception.ResourceNotFoundException;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -28,7 +28,7 @@ public class DebugService {
 
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() ->
-                        new RuntimeException("User not found"));
+                        new ResourceNotFoundException("User not found"));
 
         DebugSession session = new DebugSession();
 
@@ -63,7 +63,7 @@ public class DebugService {
 
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() ->
-                        new RuntimeException("User not found"));
+                        new ResourceNotFoundException("User not found"));
 
         List<DebugSession> sessions =
                 debugSessionRepository
@@ -84,11 +84,11 @@ public class DebugService {
 
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() ->
-                        new RuntimeException("User not found"));
+                        new ResourceNotFoundException("User not found"));
 
         DebugSession session = debugSessionRepository.findById(sessionId)
                 .orElseThrow(() ->
-                        new RuntimeException("Debug session not found"));
+                        new ResourceNotFoundException("Debug session not found"));
 
         if (!session.getUser().getId().equals(user.getId())) {
             throw new ForbiddenException(

@@ -14,10 +14,6 @@
     import org.springframework.web.cors.CorsConfiguration;
     import org.springframework.web.cors.CorsConfigurationSource;
     import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-    import com.debugmind.backend.repository.UserRepository;
-    import org.springframework.security.core.userdetails.UserDetails;
-    import org.springframework.security.core.userdetails.UserDetailsService;
-    import org.springframework.security.core.userdetails.UsernameNotFoundException;
     import org.springframework.beans.factory.annotation.Value;
     import java.util.Arrays;
     import java.util.List;
@@ -121,19 +117,7 @@
 
             return source;
         }
-        @Bean
-        public UserDetailsService userDetailsService(UserRepository userRepository) {
-
-            return email -> userRepository.findByEmail(email)
-                    .map(user -> org.springframework.security.core.userdetails.User
-                            .withUsername(user.getEmail())
-                            .password(user.getPassword())
-                            .roles("USER")
-                            .build()
-                    )
-                    .orElseThrow(() ->
-                            new UsernameNotFoundException("User not found"));
-        }
+        
         @Value("${cors.allowed-origins}")
         private String allowedOrigins;
 

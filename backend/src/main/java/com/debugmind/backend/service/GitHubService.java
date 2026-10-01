@@ -106,12 +106,14 @@ public class GitHubService {
 
         try {
 
+            String defaultBranch = getDefaultBranch(repositoryUrl);
+
             return restClient.get()
                     .uri(
                             "/repos/{owner}/{repository}/git/trees/{branch}?recursive=1",
                             owner,
                             repository,
-                            "master"
+                            defaultBranch
                     )
                     .retrieve()
                     .body(String.class);
@@ -328,5 +330,50 @@ public class GitHubService {
         }
 
         return context.toString();
+    }
+    private String getDefaultBranch(String repositoryUrl) {
+        Matcher matcher =
+                GITHUB_URL_PATTERN.matcher(repositoryUrl.trim());
+
+        if (!matcher.matches()) {
+            throw new GitHubRepositoryException(
+                    "Invalid GitHub repository URL"
+            );
+        }
+
+        String owner = matcher.group(1);
+        String repository = matcher.group(2);
+
+        try {
+            String response = restClient.get()
+                    .uri(
+                            "/repos/{owner}/{repository}",
+                            owner,
+                            repository
+                    )
+                    .retrieve()
+                    .body(String.class);
+
+            JsonNode root = objectMapper.readTree(response);
+
+            String defaultBranch =
+                    root.path("default_branch").asText();
+
+            if (defaultBranch == null || defaultBranch.isBlank()) {
+                throw new GitHubRepositoryException(
+                        "Unable to determine repository default branch"
+                );
+            }
+
+            return defaultBranch;
+
+        } catch (GitHubRepositoryException exception) {
+            throw exception;
+
+        } catch (Exception exception) {
+            throw new GitHubRepositoryException(
+                    "Unable to determine repository default branch"
+            );
+        }
     }
 }

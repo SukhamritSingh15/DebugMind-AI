@@ -18,7 +18,8 @@
     import org.springframework.security.core.userdetails.UserDetails;
     import org.springframework.security.core.userdetails.UserDetailsService;
     import org.springframework.security.core.userdetails.UsernameNotFoundException;
-
+    import org.springframework.beans.factory.annotation.Value;
+    import java.util.Arrays;
     import java.util.List;
 
     @Configuration
@@ -88,10 +89,11 @@
             CorsConfiguration configuration =
                     new CorsConfiguration();
 
-            configuration.setAllowedOrigins(List.of(
-                    "http://localhost:5173",
-                    "http://localhost:5174"
-            ));
+            configuration.setAllowedOrigins(
+                    Arrays.stream(allowedOrigins.split(","))
+                            .map(String::trim)
+                            .toList()
+            );
 
             configuration.setAllowedMethods(List.of(
                     "GET",
@@ -132,4 +134,7 @@
                     .orElseThrow(() ->
                             new UsernameNotFoundException("User not found"));
         }
+        @Value("${cors.allowed-origins}")
+        private String allowedOrigins;
+
     }

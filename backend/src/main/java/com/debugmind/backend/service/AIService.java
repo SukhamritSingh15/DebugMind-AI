@@ -15,19 +15,30 @@ import java.util.Map;
 
 @Service
 public class AIService {
-
+    private final RestClient restClient;
     private final ObjectMapper objectMapper;
-
-    @Value("${gemini.api-key}")
-    private String apiKey;
 
     @Value("${gemini.model}")
     private String model;
 
-    public AIService(ObjectMapper objectMapper) {
+    public AIService(
+            ObjectMapper objectMapper,
+            @Value("${gemini.api-key}") String apiKey
+    ) {
         this.objectMapper = objectMapper;
-    }
 
+        this.restClient = RestClient.builder()
+                .baseUrl("https://generativelanguage.googleapis.com")
+                .defaultHeader(
+                        "x-goog-api-key",
+                        apiKey
+                )
+                .defaultHeader(
+                        HttpHeaders.CONTENT_TYPE,
+                        MediaType.APPLICATION_JSON_VALUE
+                )
+                .build();
+    }
     public String analyzeCode(
             String errorMessage,
             String code,
@@ -86,17 +97,6 @@ public class AIService {
         );
         try {
 
-            RestClient client = RestClient.builder()
-                    .baseUrl("https://generativelanguage.googleapis.com")
-                    .defaultHeader(
-                            "x-goog-api-key",
-                            apiKey
-                    )
-                    .defaultHeader(
-                            HttpHeaders.CONTENT_TYPE,
-                            MediaType.APPLICATION_JSON_VALUE
-                    )
-                    .build();
 
             Map<String, Object> requestBody = Map.of(
                     "contents",
@@ -113,7 +113,7 @@ public class AIService {
                     )
             );
 
-            String response = client.post()
+            String response = restClient.post()
                     .uri("/v1beta/models/" + model + ":generateContent")
                     .body(requestBody)
                     .retrieve()
@@ -496,17 +496,6 @@ public class AIService {
 
         try {
 
-            RestClient client = RestClient.builder()
-                    .baseUrl("https://generativelanguage.googleapis.com")
-                    .defaultHeader(
-                            "x-goog-api-key",
-                            apiKey
-                    )
-                    .defaultHeader(
-                            HttpHeaders.CONTENT_TYPE,
-                            MediaType.APPLICATION_JSON_VALUE
-                    )
-                    .build();
 
             Map<String, Object> requestBody = Map.of(
                     "contents",
@@ -529,7 +518,7 @@ public class AIService {
 
                 try {
 
-                    String response = client.post()
+                    String response = restClient.post()
                             .uri("/v1beta/models/" + model + ":generateContent")
                             .body(requestBody)
                             .retrieve()

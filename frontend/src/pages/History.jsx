@@ -101,6 +101,14 @@ function History() {
           History
         </button>
 
+        <button
+        onClick={() => navigate("/github-analyzer")}
+        className="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-left text-sm text-slate-500 transition hover:bg-slate-900 hover:text-slate-200"
+      >
+        <span>⌘</span>
+        GitHub Analyzer
+      </button>
+
       </nav>
 
       <div className="mt-10 border-t border-slate-800 pt-6">

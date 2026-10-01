@@ -8,7 +8,7 @@ import Home from "./pages/Home"
 import Login from "./pages/Login"
 import Register from "./pages/Register"
 import Dashboard from "./pages/Dashboard"
-
+import GitHubAnalyzer from "./pages/GitHubAnalyzer";
 function App() {
   return (
     <div className="min-h-screen bg-slate-950 text-white">
@@ -37,6 +37,14 @@ function App() {
           </ProtectedRoute>
         }
       />
+        <Route
+    path="/github-analyzer"
+    element={
+      <ProtectedRoute>
+        <GitHubAnalyzer />
+      </ProtectedRoute>
+    }
+    />
       </Routes>
     </div>
   )

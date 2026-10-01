@@ -12,6 +12,7 @@ import { java } from "@codemirror/lang-java"
 import { python } from "@codemirror/lang-python"
 import { cpp } from "@codemirror/lang-cpp"
 
+
 function Dashboard() {
   const navigate = useNavigate()
 const { user, logout } = useAuth()
@@ -233,6 +234,14 @@ const getLanguageExtension = () => {
             <span>◷</span>
             History
           </button> 
+
+          <button
+            onClick={() => navigate("/github-analyzer")}
+            className="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-left text-sm text-slate-500 transition hover:bg-slate-900 hover:text-slate-200"
+          >
+            <span>⌘</span>
+            GitHub Analyzer
+          </button>
 
           </nav>
 

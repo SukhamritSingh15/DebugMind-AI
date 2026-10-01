@@ -11,8 +11,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-
-import java.util.List;
+import com.debugmind.backend.dto.PageResponse;
+import org.springframework.data.domain.Page;
 
 @RestController
 @RequestMapping("/api/debug")
@@ -37,16 +37,22 @@ public class DebugController {
     }
 
     @GetMapping("/history")
-    public ResponseEntity<List<DebugResponse>> getHistory(
+    public ResponseEntity<PageResponse<DebugResponse>> getHistory(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
             Authentication authentication
     ) {
 
-        List<DebugResponse> history =
+        Page<DebugResponse> history =
                 debugService.getDebugHistory(
-                        authentication.getName()
+                        authentication.getName(),
+                        page,
+                        size
                 );
 
-        return ResponseEntity.ok(history);
+        return ResponseEntity.ok(
+                PageResponse.from(history)
+        );
     }
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteDebugSession(

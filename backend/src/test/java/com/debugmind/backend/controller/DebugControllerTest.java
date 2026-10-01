@@ -5,7 +5,12 @@ import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 
+import java.util.List;
+
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.standaloneSetup;
@@ -106,6 +111,66 @@ class DebugControllerTest {
         verify(debugService).createDebugSession(
                 eq("test@example.com"),
                 any(DebugRequest.class)
+        );
+    }
+    @Test
+    void shouldReturnPaginatedDebugHistory() throws Exception {
+
+        DebugResponse response1 = new DebugResponse(
+                1L,
+                "NullPointerException",
+                "String name = null;",
+                "Java",
+                "Add a null check before using name.",
+                LocalDateTime.now()
+        );
+
+        DebugResponse response2 = new DebugResponse(
+                2L,
+                "TypeError",
+                "print(len(None))",
+                "Python",
+                "None does not have a length.",
+                LocalDateTime.now()
+        );
+
+        Page<DebugResponse> page =
+                new PageImpl<>(
+                        List.of(response1, response2)
+                );
+
+        when(debugService.getDebugHistory(
+                "test@example.com",
+                0,
+                10
+        )).thenReturn(page);
+
+        Authentication authentication =
+                org.mockito.Mockito.mock(Authentication.class);
+
+        when(authentication.getName())
+                .thenReturn("test@example.com");
+
+        mockMvc.perform(
+                        get("/api/debug/history")
+                                .param("page", "0")
+                                .param("size", "10")
+                                .principal(authentication)
+                )
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content").isArray())
+                .andExpect(jsonPath("$.content.length()").value(2))
+                .andExpect(jsonPath("$.content[0].id").value(1))
+                .andExpect(jsonPath("$.content[0].language").value("Java"))
+                .andExpect(jsonPath("$.content[1].id").value(2))
+                .andExpect(jsonPath("$.content[1].language").value("Python"))
+                .andExpect(jsonPath("$.totalElements").value(2))
+                .andExpect(jsonPath("$.totalPages").value(1));
+
+        verify(debugService).getDebugHistory(
+                "test@example.com",
+                0,
+                10
         );
     }
     @Test

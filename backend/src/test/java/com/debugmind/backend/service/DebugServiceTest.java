@@ -7,7 +7,12 @@ import com.debugmind.backend.dto.DebugRequest;
 import com.debugmind.backend.dto.DebugResponse;
 import com.debugmind.backend.entity.DebugSession;
 import com.debugmind.backend.entity.User;
+import com.debugmind.backend.exception.ResourceNotFoundException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 
+import java.util.List;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
@@ -102,8 +107,8 @@ class DebugServiceTest {
         when(userRepository.findByEmail("unknown@example.com"))
                 .thenReturn(Optional.empty());
 
-        RuntimeException exception = assertThrows(
-                RuntimeException.class,
+        ResourceNotFoundException exception = assertThrows(
+                ResourceNotFoundException.class,
                 () -> debugService.createDebugSession(
                         "unknown@example.com",
                         request
@@ -147,28 +152,59 @@ class DebugServiceTest {
         when(userRepository.findByEmail("test@example.com"))
                 .thenReturn(Optional.of(user));
 
-        when(debugSessionRepository
-                .findByUserIdOrderByCreatedAtDesc(1L))
-                .thenReturn(java.util.List.of(session1, session2));
+        Page<DebugSession> page =
+                new PageImpl<>(List.of(session1, session2));
 
-        var history =
-                debugService.getDebugHistory("test@example.com");
+        when(debugSessionRepository
+                .findByUserIdOrderByCreatedAtDesc(
+                        eq(1L),
+                        any(Pageable.class)
+                ))
+                .thenReturn(page);
+
+        Page<DebugResponse> history =
+                debugService.getDebugHistory(
+                        "test@example.com",
+                        0,
+                        10
+                );
 
         assertNotNull(history);
-        assertEquals(2, history.size());
+        assertEquals(2, history.getContent().size());
 
-        assertEquals(10L, history.get(0).getId());
-        assertEquals("Java", history.get(0).getLanguage());
+        assertEquals(
+                10L,
+                history.getContent().get(0).getId()
+        );
 
-        assertEquals(11L, history.get(1).getId());
-        assertEquals("Python", history.get(1).getLanguage());
+        assertEquals(
+                "Java",
+                history.getContent().get(0).getLanguage()
+        );
+
+        assertEquals(
+                11L,
+                history.getContent().get(1).getId()
+        );
+
+        assertEquals(
+                "Python",
+                history.getContent().get(1).getLanguage()
+        );
+
+        assertEquals(2, history.getTotalElements());
+        assertEquals(1, history.getTotalPages());
 
         verify(userRepository)
                 .findByEmail("test@example.com");
 
         verify(debugSessionRepository)
-                .findByUserIdOrderByCreatedAtDesc(1L);
+                .findByUserIdOrderByCreatedAtDesc(
+                        eq(1L),
+                        any(Pageable.class)
+                );
     }
+
     @Test
     void shouldPreventUserFromDeletingAnotherUsersSession() {
 

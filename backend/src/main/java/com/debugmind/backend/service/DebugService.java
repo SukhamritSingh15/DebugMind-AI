@@ -12,6 +12,8 @@ import com.debugmind.backend.exception.ForbiddenException;
 import com.debugmind.backend.exception.ResourceNotFoundException;
 import java.time.LocalDateTime;
 import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 
 @Service
 @RequiredArgsConstructor
@@ -59,27 +61,39 @@ public class DebugService {
         );
     }
 
-    public List<DebugResponse> getDebugHistory(String email) {
+    public Page<DebugResponse> getDebugHistory(
+            String email,
+            int page,
+            int size
+    ) {
 
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() ->
                         new ResourceNotFoundException("User not found"));
 
-        List<DebugSession> sessions =
-                debugSessionRepository
-                        .findByUserIdOrderByCreatedAtDesc(user.getId());
+        int safePage = Math.max(page, 0);
+        int safeSize = Math.min(Math.max(size, 1), 50);
 
-        return sessions.stream()
-                .map(session -> new DebugResponse(
-                        session.getId(),
-                        session.getErrorMessage(),
-                        session.getCode(),
-                        session.getLanguage(),
-                        session.getAiResponse(),
-                        session.getCreatedAt()
-                ))
-                .toList();
+        PageRequest pageable =
+                PageRequest.of(safePage, safeSize);
+
+        Page<DebugSession> sessions =
+                debugSessionRepository
+                        .findByUserIdOrderByCreatedAtDesc(
+                                user.getId(),
+                                pageable
+                        );
+
+        return sessions.map(session -> new DebugResponse(
+                session.getId(),
+                session.getErrorMessage(),
+                session.getCode(),
+                session.getLanguage(),
+                session.getAiResponse(),
+                session.getCreatedAt()
+        ));
     }
+
     public void deleteDebugSession(String email, Long sessionId) {
 
         User user = userRepository.findByEmail(email)

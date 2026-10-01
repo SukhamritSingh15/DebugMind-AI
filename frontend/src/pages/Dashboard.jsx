@@ -213,39 +213,44 @@ const getLanguageExtension = () => {
       <div className="mx-auto flex max-w-7xl pt-[72px]">
 
         {/* SIDEBAR */}
-        <aside className="hidden min-h-[calc(100vh-72px)] w-60 border-r border-white/[0.05] px-4 py-8 lg:block">
 
-          <nav className="space-y-2">
+        <aside className="min-h-[calc(100vh-72px)] w-12 shrink-0 border-r border-white/[0.05] px-1.5 py-6 lg:w-60 lg:px-4 lg:py-8">
+        <nav className="space-y-2">
+  <button
+    onClick={() => navigate("/dashboard")}
+    className="flex w-full items-center justify-center gap-3 rounded-xl border border-cyan-400/10 bg-cyan-400/[0.06] px-2 py-3 text-sm font-medium text-cyan-300 lg:justify-start lg:px-4"
+  >
+    <span>⌂</span>
+    <span className="hidden lg:inline">Dashboard</span>
+  </button>
 
-            <button className="flex w-full items-center gap-3 rounded-xl border border-cyan-400/10 bg-cyan-400/[0.06] px-4 py-3 text-left text-sm font-medium text-cyan-300">
-              <span>⌂</span>
-              Dashboard
-            </button>
+  <button
+    onClick={handleNewDebug}
+    className="flex w-full items-center justify-center gap-3 rounded-xl px-2 py-3 text-sm text-slate-500 transition hover:bg-slate-900 hover:text-slate-200 lg:justify-start lg:px-4"
+  >
+    <span>+</span>
+    <span className="hidden lg:inline">New Debug</span>
+  </button>
 
-            <button onClick={handleNewDebug} className="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-left text-sm text-slate-500 transition hover:bg-slate-900 hover:text-slate-200">
-              <span>+</span>
-              New Debug
-            </button>
+  <button
+    onClick={() => navigate("/history")}
+    className="flex w-full items-center justify-center gap-3 rounded-xl px-2 py-3 text-sm text-slate-500 transition hover:bg-slate-900 hover:text-slate-200 lg:justify-start lg:px-4"
+  >
+    <span>◷</span>
+    <span className="hidden lg:inline">History</span>
+  </button>
 
-            <button
-            onClick={() => navigate("/history")}
-            className="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-left text-sm text-slate-500 transition hover:bg-slate-900 hover:text-slate-200"
-          >
-            <span>◷</span>
-            History
-          </button> 
+  <button
+    onClick={() => navigate("/github-analyzer")}
+    className="flex w-full items-center justify-center gap-3 rounded-xl px-2 py-3 text-sm text-slate-500 transition hover:bg-slate-900 hover:text-slate-200 lg:justify-start lg:px-4"
+  >
+    <span>⌘</span>
+    <span className="hidden lg:inline">GitHub Analyzer</span>
+  </button>
 
-          <button
-            onClick={() => navigate("/github-analyzer")}
-            className="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-left text-sm text-slate-500 transition hover:bg-slate-900 hover:text-slate-200"
-          >
-            <span>⌘</span>
-            GitHub Analyzer
-          </button>
+</nav>
 
-          </nav>
-
-          <div className="mt-10 border-t border-slate-800 pt-6">
+          <div className="mt-10 hidden border-t border-slate-800 pt-6 lg:block">
 
             <p className="px-4 text-[10px] font-mono uppercase tracking-[0.18em] text-slate-700">
               Workspace
@@ -271,7 +276,7 @@ const getLanguageExtension = () => {
         </aside>
 
         {/* CONTENT */}
-        <section className="min-w-0 flex-1 px-5 py-10 sm:px-8 lg:px-12">
+        <section className="min-w-0 flex-1 px-3 py-8 sm:px-8 lg:px-12">
 
           {/* Heading */}
           <div className="mb-10">

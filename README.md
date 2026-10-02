@@ -236,7 +236,7 @@ DebugMind AI follows a layered full-stack architecture with separate frontend an
                   ┌───────────────────────────────┐
                   │        React Frontend         │
                   │                               │
-                  │ React + Vite + Tailwind CSS  │
+                  │ React + Vite + Tailwind CSS   │
                   │ Axios + CodeMirror            │
                   └──────────────┬────────────────┘
                                  │
